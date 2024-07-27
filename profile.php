@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_config.php'; // Ensure this file sets up the $conn variable
+include './actions/db_config.php';
 
 // Check if user is logged in
 if (isset($_SESSION['user_id'])) {
@@ -103,6 +103,8 @@ if (isset($_SESSION['user_id'])) {
 }
 
 $conn->close();
+
+$current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <!DOCTYPE html>
@@ -112,8 +114,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
-    <link rel="stylesheet" href="styles.css">
-
+    <link rel="stylesheet" href="./css/styles.css">
     <style>
         .container {
             max-width: 900px;
@@ -144,7 +145,8 @@ $conn->close();
 
         p {
             font-size: 16px;
-            line-height: 1.5;
+            margin: 0;
+            margin-bottom: 10px;
         }
 
         strong {
@@ -175,7 +177,6 @@ $conn->close();
         }
 
         .result-buttons button {
-            background-color: #4CAF50;
             color: white;
             border: none;
             padding: 10px 15px;
@@ -184,21 +185,49 @@ $conn->close();
             margin-right: 10px;
         }
 
-        .result-buttons button:hover {
-            background-color: #45a049;
-        }
-
         .unpin-btn {
-            background-color: #f44336;
+            background-color: #fe6f6f;
         }
 
         .unpin-btn:hover {
-            background-color: #d32f2f;
+            background-color: #f10c0c;
         }
 
         .document-item:hover {
             transform: scale(1.02);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-alert.hidden {
+            display: none;
+        }
+
+        .custom-alert-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-alert .button-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .custom-alert button {
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -210,21 +239,33 @@ $conn->close();
             <span>CEIT e-Guidelines</span>
         </div>
         <ul class="navbar-list">
-            <li class="navbar-item active"><a href="index.php">Home</a></li>
-            <li class="navbar-item"><a href="#">Forms</a></li>
-            <li class="navbar-item"><a href="profile.php">Profile</a></li>
-            <li class="navbar-item"><a href="#">About</a></li>
-            <li class="navbar-item"><a href="logout.php" id="logoutBtn">Logout</a></li>
+            <li class="navbar-item <?php echo $current_page == 'index.php' ? 'active' : ''; ?>"><a
+                    href="index.php">Home</a></li>
+            <li class="navbar-item <?php echo $current_page == 'forms.php' ? 'active' : ''; ?>"><a
+                    href="forms.php">Forms</a></li>
+            <li class="navbar-item <?php echo $current_page == 'profile.php' ? 'active' : ''; ?>"><a
+                    href="profile.php">Profile</a></li>
+            <li class="navbar-item <?php echo $current_page == 'about.php' ? 'active' : ''; ?>"><a
+                    href="about.php">About</a></li>
+            <li class="navbar-item"><a href="./actions/logout.php" id="logoutBtn">Logout</a></li>
         </ul>
     </div>
     <div class="container">
         <h2>Profile</h2>
         <?php if (isset($user)): ?>
+            <?php
+            $profilePhotoPath = 'uploads/profile_photos/' . (!empty($user['profile_photo']) ? $user['profile_photo'] : 'default.png');
+            ?>
             <div class="profile-photo">
-                <?php
-                $profilePhoto = !empty($user['profile_photo']) ? $user['profile_photo'] : 'default.jpg';
-                ?>
-                <img src="<?php echo htmlspecialchars($profilePhoto); ?>" alt="Profile Photo" class="profile-photo-img">
+                <a href="javascript:void(0);" onclick="document.getElementById('photoUpload').click();">
+                    <img src="<?php echo htmlspecialchars($profilePhotoPath); ?>" alt="Profile Photo"
+                        class="profile-photo-img">
+                </a>
+                <form id="photoForm" action="./actions/upload_photo.php" method="post" enctype="multipart/form-data"
+                    style="display: none;">
+                    <input type="file" name="profile_photo" id="photoUpload" onchange="this.form.submit();"
+                        accept="image/*">
+                </form>
             </div>
             <p><strong>Full Name:</strong>
                 <?php echo htmlspecialchars($user['fname'] . ' ' . $user['mname'] . ' ' . $user['lname']); ?></p>
@@ -267,8 +308,18 @@ $conn->close();
         <?php endif; ?>
     </div>
 
+    <div id="customAlert" class="custom-alert hidden">
+        <div class="custom-alert-content">
+            <h2 id="alertMessage"></h2>
+            <div class="button-container">
+                <button id="alertYesBtn">Yes</button>
+                <button id="alertNoBtn" class="btn-secondary">No</button>
+            </div>
+        </div>
+    </div>
 
-    <script src="profile_script.js"></script>
+    <script src="./scripts/profile_script.js"></script>
+
 </body>
 
 </html>

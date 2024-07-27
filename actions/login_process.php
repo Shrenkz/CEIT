@@ -18,7 +18,7 @@ $user = $result->fetch_assoc();
 if ($user && $password) {
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['email'] = $user['email'];
-    header("Location: index.php"); // Redirect to the main page or dashboard
+    header("Location: ../index.php"); // Redirect to the main page or dashboard
     exit();
 } else {
     echo "Invalid email or password.";

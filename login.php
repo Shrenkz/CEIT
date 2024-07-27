@@ -86,7 +86,7 @@
 <body>
     <div class="login-container">
         <h2>Login</h2>
-        <form method="POST" action="login_process.php">
+        <form method="POST" action="./actions/login_process.php">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" required>
             

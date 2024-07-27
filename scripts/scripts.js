@@ -58,36 +58,110 @@ document.addEventListener('DOMContentLoaded', (event) => {
         resultsContainer.style.display = 'block';
     }
 
+    // Function to handle pin to profile action
+    function pinToProfile(documentId) {
+        const userId = document.getElementById('user-id').value;
+
+        showCustomAlert('Are you sure you want to pin this document to your profile?', function () {
+            fetch('./actions/pin_document.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    'document_id': documentId,
+                    'user_id': userId
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Server response:', data); // Debugging line
+                    if (data.success) {
+                        showCustomAlert('The document has been pinned to your profile.');
+                    } else {
+                        console.error('Server error:', data); // Debugging line
+                        showCustomAlert('There was a problem pinning the document.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Request error:', error); // Debugging line
+                    showCustomAlert('There was a problem with the request.');
+                });
+        });
+
+        window.onclick = (event) => {
+            if (event.target === customAlert) {
+                customAlert.classList.add('hidden');
+            }
+        };
+    }
+
+    // Function to handle view document action
+    function viewDocument(documentId) {
+        window.location.href = `./actions/view_document.php?id=${documentId}`;
+    }
+
+    // Display filtered results
+    function displayResults(results) {
+        const resultsContainer = document.getElementById('results');
+        resultsContainer.innerHTML = '';
+
+        if (Array.isArray(results) && results.length > 0) {
+            results.forEach(result => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'result-item';
+
+                const title = document.createElement('h4');
+                title.textContent = result.title || 'No title';
+                resultItem.appendChild(title);
+
+                const description = document.createElement('p');
+                description.textContent = result.description || 'No description';
+                resultItem.appendChild(description);
+
+                const version = document.createElement('p');
+                version.innerHTML = `<small>Version: ${result.version_number || 'N/A'}</small>`;
+                resultItem.appendChild(version);
+
+                const format = document.createElement('p');
+                format.innerHTML = `<small>Format: ${result.format || 'N/A'}</small>`;
+                resultItem.appendChild(format);
+
+                const resultButtons = document.createElement('div');
+                resultButtons.className = 'result-buttons';
+
+                const pinBtn = document.createElement('button');
+                pinBtn.className = 'pin-btn';
+                pinBtn.textContent = 'Pin to Profile';
+                pinBtn.setAttribute('data-document-id', result.document_id);
+                pinBtn.addEventListener('click', function () {
+                    pinToProfile(result.document_id);
+                });
+                resultButtons.appendChild(pinBtn);
+
+                const viewBtn = document.createElement('button');
+                viewBtn.className = 'view-btn';
+                viewBtn.textContent = 'View';
+                viewBtn.setAttribute('data-document-id', result.document_id);
+                viewBtn.addEventListener('click', function () {
+                    viewDocument(result.document_id);
+                });
+                resultButtons.appendChild(viewBtn);
+
+                resultItem.appendChild(resultButtons);
+
+                resultsContainer.appendChild(resultItem);
+            });
+        } else {
+            resultsContainer.textContent = 'No results found for the applied filters.';
+        }
+    }
+
     // Pin to profile
     document.querySelectorAll('.pin-btn').forEach(button => {
         button.addEventListener('click', function () {
             const documentId = this.getAttribute('data-document-id');
-            const userId = document.getElementById('user-id').value;
-
-            showCustomAlert('Are you sure you want to pin this document to your profile?', function () {
-                // Make AJAX request to pin document
-                fetch('pin_document.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams({
-                        'document_id': documentId,
-                        'user_id': userId
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            showCustomAlert('The document has been pinned to your profile.');
-                        } else {
-                            showCustomAlert('There was a problem pinning the document.');
-                        }
-                    })
-                    .catch(error => {
-                        showCustomAlert('There was a problem with the request.');
-                    });
-            });
+            pinToProfile(documentId);
         });
     });
 
@@ -96,9 +170,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     if (unpinButtons.length > 0) {
         unpinButtons.forEach(button => {
             button.addEventListener('click', function () {
-                const documentId = this.getAttribute('data-id');
+                const documentId = this.getAttribute('data-document-id');
                 showCustomAlert('Are you sure you want to unpin this document from your profile?', function () {
-                    fetch('unpin_document.php', {
+                    fetch('./actions/unpin_document.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -111,7 +185,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                         .then(result => {
                             alert(result); // Display the server's response
                             if (result.includes('success')) {
-                                this.closest('.document-item').remove(); // Remove the document from the view
+                                this.closest('.document-item').remove();
                                 showCustomAlert('The document has been unpinned from your profile.');
                             } else {
                                 showCustomAlert('There was a problem unpinning the document.');
@@ -130,10 +204,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
     if (viewButtons.length > 0) {
         viewButtons.forEach(button => {
             button.addEventListener('click', function () {
-                const documentId = this.getAttribute('data-id');
-                if (documentId) {
-                    window.location.href = `view_document.php?id=${documentId}`;
-                }
+                const documentId = this.getAttribute('data-document-id');
+                viewDocument(documentId);
             });
         });
     } else {
@@ -153,15 +225,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const version = document.getElementById('version').value;
 
         const filters = {
-            keywords: keywords,
-            format: format,
-            version: version
+            keywords: keywords || '',
+            format: format || '',
+            version: version || ''
         };
 
         console.log('Filters:', filters); // Debugging line
 
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'fetch_filtered_data.php?filters=' + encodeURIComponent(JSON.stringify(filters)), true);
+        xhr.open('GET', './actions/fetch_filtered_data.php?filters=' + encodeURIComponent(JSON.stringify(filters)), true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
@@ -183,66 +255,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 }
             }
         };
-
-        xhr.onerror = function () {
-            console.error("Request failed");
-            showCustomAlert('Request failed. Please check your network connection.');
-        };
-
         xhr.send();
-    });
-
-    // Function to display the filtered results
-    function displayResults(results) {
-        const resultsContainer = document.getElementById('results');
-        resultsContainer.innerHTML = '';
-
-        if (Array.isArray(results) && results.length > 0) {
-            results.forEach(result => {
-                const resultItem = document.createElement('div');
-                resultItem.className = 'result-item';
-
-                const title = document.createElement('h4');
-                title.textContent = result.title || 'No title';
-                resultItem.appendChild(title);
-
-                const description = document.createElement('p');
-                description.textContent = result.description || 'No description';
-                resultItem.appendChild(description);
-
-                const version = document.createElement('p');
-                version.innerHTML = `<small>Version: ${result.version || 'N/A'}</small>`;
-                resultItem.appendChild(version);
-
-                const format = document.createElement('p');
-                format.innerHTML = `<small>Format: ${result.format || 'N/A'}</small>`;
-                resultItem.appendChild(format);
-
-                const pinBtn = document.createElement('button');
-                pinBtn.className = 'pin-btn';
-                pinBtn.textContent = 'Pin to Profile';
-                resultItem.appendChild(pinBtn);
-
-                const viewBtn = document.createElement('button');
-                viewBtn.className = 'view-btn';
-                viewBtn.textContent = 'View';
-                resultItem.appendChild(viewBtn);
-
-                resultsContainer.appendChild(resultItem);
-            });
-        } else {
-            resultsContainer.textContent = 'No results found for the applied filters.';
-        }
-    }
-
-
-    // Handle view button click
-    document.querySelectorAll('.view-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const documentId = this.getAttribute('data-id');
-            if (documentId) {
-                window.location.href = `view_document.php?id=${documentId}`;
-            }
-        });
     });
 });

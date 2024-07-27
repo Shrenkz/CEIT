@@ -45,64 +45,8 @@ if ($stmt) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Document</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/styles.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #28a745;
-            padding: 10px 20px;
-            color: #fff;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo img {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
-        }
-
-        .logo span {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        .navbar-list {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .navbar-item {
-            margin-left: 20px;
-        }
-
-        .navbar-item a {
-            color: #fff;
-            text-decoration: none;
-            padding: 10px;
-            transition: background 0.3s;
-        }
-
-        .navbar-item a:hover,
-        .navbar-item.active a {
-            background-color: #218838;
-            border-radius: 5px;
-        }
-
         .container {
             padding: 20px;
             max-width: 800px;
@@ -136,6 +80,10 @@ if ($stmt) {
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .pdf-viewer {
+            margin-top: 20px;
         }
 
         .button-container {
@@ -174,13 +122,13 @@ if ($stmt) {
 <body>
     <div class="navbar">
         <div class="logo">
-            <img src="logo.png" alt="Logo">
+            <img src="../logo.png" alt="Logo">
             <span>CEIT e-Guidelines</span>
         </div>
         <ul class="navbar-list">
-            <li class="navbar-item"><a href="index.php">Home</a></li>
+            <li class="navbar-item"><a href="../index.php">Home</a></li>
             <li class="navbar-item"><a href="#">Forms</a></li>
-            <li class="navbar-item"><a href="profile.php">Profile</a></li>
+            <li class="navbar-item"><a href="../profile.php">Profile</a></li>
             <li class="navbar-item"><a href="#">About</a></li>
             <li class="navbar-item"><a href="logout.php" id="logoutBtn">Logout</a></li>
         </ul>
@@ -194,12 +142,16 @@ if ($stmt) {
                 <p><strong>Created At:</strong> <?php echo htmlspecialchars($document['created_at']); ?></p>
             </div>
         </div>
-        <div class="document-content">
-            <?php echo nl2br(htmlspecialchars($document['content'])); ?>
-        </div>
         <div class="button-container">
-            <a href="index.php" class="btn btn-primary">Back to Search</a>
-            <a href="print_document.php?id=<?php echo $document_id; ?>" class="btn btn-secondary" target="_blank">Download</a>
+            <a href="../index.php" class="btn btn-primary">Back to Search</a>
+            <a href="download.php?file=<?php echo urlencode($document['content']); ?>"
+                class="btn btn-secondary">Download</a>
+        </div>
+        <!-- <div class="document-content">
+            <?php echo nl2br(htmlspecialchars($document['content'])); ?>
+        </div> -->
+        <div class="pdf-viewer">
+            <iframe src="<?php echo htmlspecialchars($document['content']); ?>" width="100%" height="700px"></iframe>
         </div>
     </div>
 </body>

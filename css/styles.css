@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 /* Global styles */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -7,15 +13,6 @@ body {
 }
 
 /* Navbar styles */
-.navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #28a745;
-    padding: 10px 20px;
-    color: #fff;
-}
-
 .logo {
     display: flex;
     align-items: center;
@@ -30,6 +27,15 @@ body {
 .logo span {
     font-size: 1.5em;
     font-weight: bold;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #28a745;
+    padding: 10px 20px;
+    color: #fff;
 }
 
 .navbar-list {
@@ -48,6 +54,7 @@ body {
     text-decoration: none;
     padding: 10px;
     transition: background 0.3s;
+    border-radius: 5px;
 }
 
 .navbar-item a:hover,
@@ -61,10 +68,17 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 20px;
+    gap: 20px;
 }
 
 .container {
     flex: 3;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .container h2 {
@@ -84,7 +98,7 @@ body {
 }
 
 .search-bar input {
-    flex: 1;
+    flex: 3;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -139,11 +153,11 @@ body {
 
 @keyframes modalopen {
     from {
-        opacity: 0
+        opacity: 0;
     }
 
     to {
-        opacity: 1
+        opacity: 1;
     }
 }
 
@@ -189,25 +203,32 @@ body {
 }
 
 .button-container button {
-    background-color: #4CAF50;
+    background-color: #28a745;
     color: white;
     padding: 10px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background 0.3s;
 }
 
 .button-container button:hover {
-    background-color: #45a049;
+    background-color: #218838;
+}
+
+.container,
+.frequently-accessed {
+    box-sizing: border-box;
 }
 
 /* Results styles */
 #resultsContainer {
+    flex: 1;
     margin-top: 20px;
     max-width: 98%;
 }
 
-.result-count {
+#resultCount {
     margin-bottom: 20px;
 }
 
@@ -238,7 +259,35 @@ body {
 }
 
 .result-buttons button {
-    flex: 1;
+    flex: 3;
+    padding: 10px;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* PIN STYLE */
+
+.pin-btn {
+    flex: 3;
+    padding: 10px;
+    background-color: blue;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.pin-btn:hover {
+    background-color: #3e70e6;
+}
+
+/* View button styling */
+.view-btn {
+    flex: 3;
     padding: 10px;
     background-color: #28a745;
     color: #fff;
@@ -248,36 +297,21 @@ body {
     transition: background 0.3s;
 }
 
-.result-buttons button:hover {
-    background-color: #218838;
-}
-
-.pin-btn {
-    background-color: #28a745;
-    color: white;
-}
-
-.pin-btn:hover {
-    background-color: #218838;
-}
-
-/* View button styling */
-.view-btn {
-    background-color: #28a745;
-    color: white;
-}
-
 .view-btn:hover {
     background-color: #218838;
 }
 
 /* Frequently accessed documents styles */
 .frequently-accessed {
-    flex: 1;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
+    width: 400px;
+    height: 350px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
 }
 
 .frequently-accessed h4 {
@@ -292,7 +326,7 @@ body {
 }
 
 .frequently-accessed li {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .frequently-accessed li a {
@@ -303,6 +337,8 @@ body {
 .frequently-accessed li a:hover {
     text-decoration: underline;
 }
+
+/* CUSTOM ALERT */
 
 .custom-alert {
     position: fixed;
@@ -334,6 +370,10 @@ body {
     color: #333;
 }
 
+.custom-alert .button-container {
+    margin-top: 20px;
+}
+
 .custom-alert button {
     background-color: #4CAF50;
     color: white;
@@ -341,9 +381,18 @@ body {
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 10px;
+    margin: 0 5px;
+    transition: background 0.3s;
 }
 
 .custom-alert button:hover {
     background-color: #45a049;
+}
+
+.custom-alert .btn-secondary {
+    background-color: #f44336;
+}
+
+.custom-alert .btn-secondary:hover {
+    background-color: #d32f2f;
 }

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'db_config.php';
+include './actions/db_config.php';
 
 // Initialize variables
 $searchQuery = '';
@@ -116,6 +116,8 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
         $stmt->close();
     }
 }
+
+$current_page = basename($_SERVER['PHP_SELF']);
 ?>
 
 <!DOCTYPE html>
@@ -125,9 +127,8 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./css/styles.css">
 </head>
-
 
 <body>
     <div class="navbar">
@@ -136,11 +137,15 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
             <span>CEIT e-Guidelines</span>
         </div>
         <ul class="navbar-list">
-            <li class="navbar-item active"><a href="index.php">Home</a></li>
-            <li class="navbar-item"><a href="#">Forms</a></li>
-            <li class="navbar-item"><a href="profile.php">Profile</a></li>
-            <li class="navbar-item"><a href="#">About</a></li>
-            <li class="navbar-item"><a href="logout.php" id="logoutBtn">Logout</a></li>
+            <li class="navbar-item <?php echo $current_page == 'index.php' ? 'active' : ''; ?>"><a
+                    href="index.php">Home</a></li>
+            <li class="navbar-item <?php echo $current_page == 'forms.php' ? 'active' : ''; ?>"><a
+                    href="forms.php">Forms</a></li>
+            <li class="navbar-item <?php echo $current_page == 'profile.php' ? 'active' : ''; ?>"><a
+                    href="profile.php">Profile</a></li>
+            <li class="navbar-item <?php echo $current_page == 'about.php' ? 'active' : ''; ?>"><a
+                    href="about.php">About</a></li>
+            <li class="navbar-item"><a href="./actions/logout.php" id="logoutBtn">Logout</a></li>
         </ul>
     </div>
     <div class="main-content">
@@ -180,7 +185,7 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
                 </div>
             </form>
             <div id="resultsContainer">
-                <div class="result-count">
+                <div id="resultCount">
                     <?php
                     if (!empty($searchQuery) || !empty($keywords) || !empty($format) || $version !== 'all') {
                         $queryString = htmlspecialchars($searchQuery);
@@ -213,7 +218,7 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
                                         data-document-id="<?php echo htmlspecialchars($result['id']); ?>">Pin to
                                         Profile</button>
                                     <button class="view-btn"
-                                        data-id="<?php echo htmlspecialchars($result['id']); ?>">View</button>
+                                        data-document-id="<?php echo htmlspecialchars($result['id']); ?>">View</button>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -240,7 +245,7 @@ if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
         </div>
     </div>
 
-    <script src="scripts.js"></script>
+    <script src="./scripts/scripts.js"></script>
 
     <input type="hidden" id="user-id" value="<?php echo $_SESSION['user_id']; ?>">
 
